@@ -49,28 +49,32 @@ namespace CrownHotelListing.Infrastructure
                     Id = 1,
                     Name = "Diamond Image",
                     Address = "Alagbaka Akure",
-                    CountryId = 1
+                    CountryId = 1,
+                    Rating = 3.0
                 },
                 new Hotel
                 {
                     Id = 2,
                     Name = "Royal",
                     Address = "Toronto district",
-                    CountryId = 2
+                    CountryId = 2,
+                    Rating = 4.5
                 },
                 new Hotel
                 {
                     Id = 3,
                     Name = "Eagles",
                     Address = "Washington Avenue",
-                    CountryId = 3
+                    CountryId = 3,
+                    Rating = 4.0
                 },
                 new Hotel
                 {
                     Id = 4,
                     Name = "Queen",
                     Address = "Burkingham lane",
-                    CountryId = 4
+                    CountryId = 4,
+                    Rating = 5.0
                 }
             );
         }
