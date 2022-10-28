@@ -50,7 +50,7 @@ namespace CrownHotelListing.Infrastructure
                     Name = "Diamond Image",
                     Address = "Alagbaka Akure",
                     CountryId = 1,
-                    Rating = 3.0
+                    Rating = 3.5
                 },
                 new Hotel
                 {
@@ -66,7 +66,7 @@ namespace CrownHotelListing.Infrastructure
                     Name = "Eagles",
                     Address = "Washington Avenue",
                     CountryId = 3,
-                    Rating = 4.0
+                    Rating = 4.5
                 },
                 new Hotel
                 {
@@ -74,7 +74,7 @@ namespace CrownHotelListing.Infrastructure
                     Name = "Queen",
                     Address = "Burkingham lane",
                     CountryId = 4,
-                    Rating = 5.0
+                    Rating = 4.7
                 }
             );
         }

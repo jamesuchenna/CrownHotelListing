@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CrownHotelListing.Infrastructure.Repositories
 {
-    internal class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
         IGenericRepository<Country> _countries;

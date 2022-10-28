@@ -1,5 +1,7 @@
 using CrownHotelListing.Core.AutoMapperProfiles;
+using CrownHotelListing.Core.Interfaces;
 using CrownHotelListing.Infrastructure;
+using CrownHotelListing.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -45,6 +47,7 @@ namespace CrownHotelListing
                     .AllowAnyHeader()
                 );
             });
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(AutoMapperInitializer));
             services.AddControllers();
         }
