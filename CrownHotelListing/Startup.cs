@@ -1,5 +1,7 @@
+using CrownHotelListing.API.Configurations;
 using CrownHotelListing.Core.AutoMapperProfiles;
 using CrownHotelListing.Core.Interfaces;
+using CrownHotelListing.Core.Services;
 using CrownHotelListing.Infrastructure;
 using CrownHotelListing.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -35,6 +37,10 @@ namespace CrownHotelListing
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("dbConn"))
             );
+            services.AddAuthentication();
+            services.ConfigureIdentity();
+            services.ConfigureJWT(Configuration);
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CrownHotelListing", Version = "v1" });
@@ -47,8 +53,9 @@ namespace CrownHotelListing
                     .AllowAnyHeader()
                 );
             });
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(AutoMapperInitializer));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddControllers();
         }
 
@@ -68,6 +75,7 @@ namespace CrownHotelListing
             app.UseCors("AllowAll");
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -17,6 +17,8 @@ namespace CrownHotelListing.Core.AutoMapperProfiles
             CreateMap<Country, CountryResponseDto>().ReverseMap();
             CreateMap<Hotel, HotelRequestDto>().ReverseMap();
             CreateMap<Hotel, HotelResponseDto>().ReverseMap();
+            CreateMap<ApiUser, UserRequestDto >().ReverseMap();
+
         }
     }
 }

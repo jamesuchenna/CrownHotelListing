@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CrownHotelListing.Core.DTOs;
 using CrownHotelListing.Core.Interfaces;
+using CrownHotelListing.Domain.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -60,6 +62,35 @@ namespace CrownHotelListing.API.Controllers
                 _logger.LogError(ex, $"Something went wrong in the {nameof(GetCountries)} could not retrieve country with id: {id}");
                 return StatusCode(500, "Internal server Error. Please Try Again Later");
             }
-        } 
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateCountry(CountryRequestDto countryRequestDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(CreateCountry)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var country = _mapper.Map<Country>(countryRequestDto);
+                await _unitOfWork.Countries.AddAsync(country);
+                await _unitOfWork.Save();
+
+                return CreatedAtRoute("CreateCountry", new { id = country.Id }, country);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in the {nameof(CreateCountry)}");
+                return StatusCode(500, "Internal server Error. Please Try Again Later");
+            }
+
+        }
     }
 }
