@@ -31,19 +31,12 @@ namespace CrownHotelListing.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetCountries()
+        public async Task<IActionResult> GetCountries([FromQuery] PaginatorParams paginatorParams)
         {
-            try
-            {
-                var countries = await _unitOfWork.Countries.GetAllAsync();
+                var countries = await _unitOfWork.Countries.GetPageAsync(paginatorParams);
                 var results = _mapper.Map<IList<CountryResponseDto>>(countries);
-                return Ok(results);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(GetCountries)}");
-                return StatusCode(500, "Internal server Error. Please Try Again Later");
-            }
+                
+            return Ok(results);
         }
 
         [HttpGet("{id:int}", Name = "GetCountry")]
@@ -51,17 +44,9 @@ namespace CrownHotelListing.API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCountry(int id)
         {
-            try
-            {
                 var country = await _unitOfWork.Countries.GetAsync(c => c.Id == id, new List<string> { "Hotels" });
                 var result = _mapper.Map<CountryResponseDto>(country);
                 return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(GetCountries)} could not retrieve country with id: {id}");
-                return StatusCode(500, "Internal server Error. Please Try Again Later");
-            }
         }
 
         [Authorize(Roles = "Administrator")]
@@ -77,19 +62,11 @@ namespace CrownHotelListing.API.Controllers
                 _logger.LogError($"Invalid POST attempt in {nameof(CreateCountry)}");
                 return BadRequest(ModelState);
             }
-            try
-            {
                 var country = _mapper.Map<Country>(countryRequestDto);
                 await _unitOfWork.Countries.AddAsync(country);
                 await _unitOfWork.Save();
 
                 return CreatedAtRoute("CreateCountry", new { id = country.Id }, country);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(CreateCountry)}");
-                return StatusCode(500, "Internal server Error. Please Try Again Later");
-            }
         }
 
         [HttpPut("{id:int}")]
@@ -103,8 +80,6 @@ namespace CrownHotelListing.API.Controllers
                 _logger.LogError($"Invalid UPDATE attempt in {nameof(UpdateCountry)}");
                 return BadRequest(ModelState);
             }
-            try
-            {
                 var country = await _unitOfWork.Countries.GetAsync(c => c.Id == id);
                 if (country == null)
                 {
@@ -117,12 +92,6 @@ namespace CrownHotelListing.API.Controllers
                 await _unitOfWork.Save();
 
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(UpdateCountry)}");
-                return StatusCode(500, "Internal server Error. Please Try Again Later");
-            }
         }
 
         [HttpDelete("{id:int}")]
@@ -136,8 +105,6 @@ namespace CrownHotelListing.API.Controllers
                 _logger.LogError($"Invalid DELETE attempt in {nameof(DeleteCountry)}");
                 return BadRequest();
             }
-            try
-            {
                 var country = await _unitOfWork.Countries.GetAsync(h => h.Id == id);
                 if (country == null)
                 {
@@ -148,12 +115,6 @@ namespace CrownHotelListing.API.Controllers
                 await _unitOfWork.Save();
 
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(DeleteCountry)} could not delete country with id: {id}");
-                return StatusCode(500, "Internal server Error. Please Try Again Later");
-            }
         }
     }
 }

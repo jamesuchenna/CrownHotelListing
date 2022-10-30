@@ -1,11 +1,12 @@
 ﻿using CrownHotelListing.Core.Interfaces;
+using CrownHotelListing.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace CrownHotelListing.Infrastructure.Repositories
 {
@@ -76,6 +77,22 @@ namespace CrownHotelListing.Infrastructure.Repositories
             }
 
             return await query.AsNoTracking().FirstOrDefaultAsync(expression);
+        }
+
+        public async Task<IPagedList<T>> GetPageAsync(PaginatorParams paginatorParams, List<string> includes = null)
+        {
+            IQueryable<T> query = _db;
+
+            if (includes != null)
+            {
+                foreach (var includeProperty in includes)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.AsNoTracking().ToPagedListAsync(paginatorParams.PageNumber,
+                paginatorParams.PageSize);
         }
 
         public void Update(T entity)

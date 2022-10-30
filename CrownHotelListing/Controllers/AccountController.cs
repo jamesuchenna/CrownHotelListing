@@ -22,13 +22,11 @@ namespace CrownHotelListing.API.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly IMapper _mapper;
 
-        public AccountController(UserManager<ApiUser> userManager, IAuthService authService, 
-            /*SignInManager<ApiUser> signInManager,*/ 
+        public AccountController(UserManager<ApiUser> userManager, IAuthService authService,
             ILogger<AccountController> logger, IMapper mapper)
         {
             _userManager = userManager;
             _authService = authService;
-            //_signInManager = signInManager;
             _logger = logger;
             _mapper = mapper;
         }
@@ -46,30 +44,21 @@ namespace CrownHotelListing.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            try
-            {
-                var user = _mapper.Map<ApiUser>(userRequestDto);
-                user.UserName = userRequestDto.Email;
-                var result = await _userManager.CreateAsync(user, userRequestDto.PassWord);
+            var user = _mapper.Map<ApiUser>(userRequestDto);
+            user.UserName = userRequestDto.Email;
+            var result = await _userManager.CreateAsync(user, userRequestDto.PassWord);
 
-                if (!result.Succeeded)
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(error.Code, error.Description);
-                    }
-                    return BadRequest(ModelState);
+                    ModelState.AddModelError(error.Code, error.Description);
                 }
-
-                await _userManager.AddToRolesAsync(user, userRequestDto.Roles);
-                return Accepted();
-
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went in the {nameof(Register)}");
-                return Problem($"Something went wrong", statusCode: 500);
-            }
+
+            await _userManager.AddToRolesAsync(user, userRequestDto.Roles);
+            return Accepted();
         }
 
         [HttpPost]
@@ -84,20 +73,12 @@ namespace CrownHotelListing.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            try
+            if (!await _authService.ValidateUser(userLoginDto))
             {
-                if (!await _authService.ValidateUser(userLoginDto))
-                {
-                    return Unauthorized(userLoginDto);
-                }
+                return Unauthorized(userLoginDto);
+            }
 
-                return Accepted(new { Token = await _authService.CreateToken() });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Something went in the {nameof(Login)}");
-                return Problem($"Something went wrong", statusCode: 500);
-            }
+            return Accepted(new { Token = await _authService.CreateToken() });
         }
     }
 }
